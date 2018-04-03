@@ -1,0 +1,9 @@
+select * from accounts where id between 1 and 10000 AND id between 5000 and 6000
+--------------------------------------------------
+SELECT
+  *
+FROM
+  accounts
+WHERE
+  BETWEEN id 1 AND 10000
+  AND BETWEEN id 5000 AND 6000

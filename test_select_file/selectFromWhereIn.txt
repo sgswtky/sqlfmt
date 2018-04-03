@@ -1,0 +1,9 @@
+select * from accounts where account_name IN ("--", "null") AND account_name NOT IN ("TEST", "test")
+--------------------------------------------------
+SELECT
+  *
+FROM
+  accounts
+WHERE
+  account_name in ("--", "null")
+  AND account_name not in ("TEST", "test")

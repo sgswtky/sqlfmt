@@ -1,0 +1,16 @@
+select * from (select * from (select * from user) a ) aa
+--------------------------------------------------
+SELECT
+  *
+FROM
+  (
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          *
+        FROM
+          user
+      ) AS a
+  ) AS aa

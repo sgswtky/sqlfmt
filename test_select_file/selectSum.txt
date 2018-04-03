@@ -1,0 +1,11 @@
+select sum((select * from aaa) as aaaa) a from accounts
+--------------------------------------------------
+SELECT
+  SUM ((
+    SELECT
+      *
+    FROM
+      aaa
+  )) AS a
+FROM
+  accounts

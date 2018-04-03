@@ -1,0 +1,6 @@
+select * from accounts
+--------------------------------------------------
+SELECT
+  *
+FROM
+  accounts

@@ -1,0 +1,19 @@
+select * from accounts parent inner join child ON parent.account_id = child.parent_account_id AND parent.account_id = ? inner join (select * from account_group where is_deleted = false) g on child.group_id = g.group_id ORDER BY group_name
+--------------------------------------------------
+SELECT
+  *
+FROM
+  accounts AS parent
+  JOIN child
+    ON parent.account_id = child.parent_account_id
+    AND parent.account_id = ?
+  JOIN (
+    SELECT
+      *
+    FROM
+      account_group
+    WHERE
+      is_deleted = false
+  ) AS g
+    ON child.group_id = g.group_id
+ORDER BY group_name

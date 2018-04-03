@@ -1,0 +1,15 @@
+select case account_type when 'free' then '' when 'silver' then rank.silver when 'platinum' then rank.platinum when 'vip' then rank.vip else rank.normal end account_rank from accounts a inner join rank r on a.account_id = r.account_id and a.account_type = r.account_type
+--------------------------------------------------
+SELECT
+  CASE account_type
+    WHEN "free" THEN ""
+    WHEN "silver" THEN rank.silver
+    WHEN "platinum" THEN rank.platinum
+    WHEN "vip" THEN rank.vip
+    ELSE rank.normal
+    END AS account_rank
+FROM
+  accounts AS a
+  JOIN rank AS r
+    ON a.account_id = r.account_id
+    AND a.account_type = r.account_type
