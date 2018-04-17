@@ -155,7 +155,7 @@ func (b *builder) tableExpr(expr sqlparser.TableExpr) string {
 func (b *builder) simpleTableExpr(expr sqlparser.SimpleTableExpr) string {
 	switch parsedExpr := expr.(type) {
 	case sqlparser.TableName:
-		return parsedExpr.Name.String()
+		return formatDBTable(parsedExpr.Qualifier.String(), parsedExpr.Name.String())
 	case *sqlparser.Subquery:
 		return formatSubquery(b.selectStatement(parsedExpr.Select))
 	default:
