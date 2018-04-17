@@ -43,6 +43,7 @@ const (
 	Variance      = "VARIANCE"
 	Now           = "NOW"
 	Concat        = "CONCAT"
+	Ifnull        = "IFNULL"
 )
 
 const (

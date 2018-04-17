@@ -98,6 +98,8 @@ func (b *builder) expr(e sqlparser.Expr) string {
 		//case *sqlparser.Default:
 		//	// TODO
 		//	fmt.Println("*sqlparser.Default")
+	case nil:
+		return ""
 	default:
 		unknownType(parsedExpr)
 	}
@@ -190,6 +192,8 @@ func (b *builder) getFuncExpr(funcExpr *sqlparser.FuncExpr) string {
 	case Now:
 		fallthrough
 	case Concat:
+		fallthrough
+	case Ifnull:
 		fallthrough
 	case Sum:
 		if len(strExprs) > 1 {
