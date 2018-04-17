@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"bufio"
-	"flag"
-	"io"
 	"bytes"
-	"io/ioutil"
 	"errors"
+	"flag"
+	"fmt"
 	"golang.org/x/crypto/ssh/terminal"
+	"io"
+	"io/ioutil"
+	"os"
 )
 
 var (
@@ -71,7 +71,7 @@ func exec() error {
 		return fmtSQL(*sqlOpt, os.Stdout, modeCommand)
 	case modeFile:
 		if err := execFileMode(); err != nil {
-			return errors.New(fmt.Sprintf("%s: %s", *fileOpt, err.Error()))
+			return fmt.Errorf("%s: %s", *fileOpt, err.Error())
 		}
 		return nil
 	case modePipe:
@@ -81,7 +81,7 @@ func exec() error {
 		// helo mode
 		usage()
 	}
-	return errors.New("Please input parameter.")
+	return errors.New("please input parameter")
 }
 
 func dialogMode() error {

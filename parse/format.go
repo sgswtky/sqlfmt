@@ -72,7 +72,7 @@ func formatSelect(cache string, columns []string, distinct string, table []strin
 }
 
 func isDual(tables []string) bool {
-	return stringsContains(tables, Dual)
+	return stringsContains(tables, dual)
 }
 
 func formatWhere(where string) string {
@@ -158,10 +158,10 @@ func formatLimit(limit, offset string) string {
 func formatOrderBy(tuples []*tuple2String) string {
 	result := make([]string, 0)
 	for _, v := range tuples {
-		if strings.ToUpper(v.str1) == ASC {
+		if strings.ToUpper(v.str1) == asc {
 			result = append(result, v.str2)
 		} else {
-			result = append(result, fmt.Sprintf("%s %s", v.str2, DESC))
+			result = append(result, fmt.Sprintf("%s %s", v.str2, desc))
 		}
 	}
 	return fmt.Sprintf("ORDER BY %s", strings.Join(result, ", "))
@@ -234,9 +234,8 @@ func formatTable(tableName, hintType string, hints []string) string {
 	if len(hints) > 0 {
 		hintString := strings.Join(hints, ",")
 		return fmt.Sprintf("%s %s INDEX (%s)", tableName, strings.ToUpper(strings.TrimSpace(hintType)), hintString)
-	} else {
-		return fmt.Sprintf("%s", tableName)
 	}
+	return fmt.Sprintf("%s", tableName)
 }
 
 func formatAsTable(tableName, asString, hintType string, hints []string) string {

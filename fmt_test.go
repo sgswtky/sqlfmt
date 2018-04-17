@@ -1,14 +1,14 @@
 package main
 
 import (
-	"testing"
-	"io/ioutil"
-	"strings"
-	"github.com/sgswtky/sqlfmt/parse"
-	"fmt"
-	"path/filepath"
-	"os"
 	"bytes"
+	"fmt"
+	"github.com/sgswtky/sqlfmt/parse"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
 )
 
 const (
@@ -79,13 +79,13 @@ import "fmt"
 
 func main() {
 	// sqlfmt
-	sql := `+ "`", `
+	sql := `+"`", `
 SELECT
   *
 FROM
   user
   LEFT JOIN userb
-    ON user.user_id = userb.user_id`+ "`", `
+    ON user.user_id = userb.user_id`+"`", `
 	fmt.Println(sql)
 }
 

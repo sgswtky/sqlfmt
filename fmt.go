@@ -1,14 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"github.com/sgswtky/sqlfmt/parse"
+	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
-	"go/ast"
-	"github.com/sgswtky/sqlfmt/parse"
-	"go/format"
 	"io"
-	"errors"
 	"io/ioutil"
 	"strings"
 )
@@ -33,7 +33,7 @@ func fmtSQL(sql string, w io.Writer, mode int) error {
 	writeCount, err := fmt.Fprint(w, result)
 	if writeCount != len([]byte(result)) {
 		// TODO error message
-		return errors.New("write result byte error.")
+		return errors.New("write result byte error")
 	}
 	return err
 }
@@ -49,12 +49,12 @@ func parseAssignStmt(assignStmt *ast.AssignStmt) error {
 		ident := getIdent(assignStmt.Lhs)
 
 		if basicLit == nil || ident == nil {
-			return errors.New("unknown error.")
+			return errors.New("unknown error")
 		}
 
 		if ident.Name == variableName {
 			sqlRune := []rune(basicLit.Value)
-			trimSQL := string(sqlRune[1:len(sqlRune)-1])
+			trimSQL := string(sqlRune[1 : len(sqlRune)-1])
 			builder := parse.NewBuilder(trimSQL)
 			sql, err := builder.Parse()
 			if err != nil {
@@ -84,7 +84,7 @@ func getIdent(expr []ast.Expr) *ast.Ident {
 	}
 }
 
-func fmtFile(astFilename string, fileReader io.Reader, fileWriter io.Writer) (error) {
+func fmtFile(astFilename string, fileReader io.Reader, fileWriter io.Writer) error {
 
 	// Read source
 	src, err := ioutil.ReadAll(fileReader)

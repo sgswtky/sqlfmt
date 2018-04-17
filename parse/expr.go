@@ -1,12 +1,12 @@
 package parse
 
 import (
-	"github.com/sgswtky/sqlparser"
 	"fmt"
+	"github.com/sgswtky/sqlparser"
 	"strings"
 )
 
-func (b *builder) expr(e sqlparser.Expr) string {
+func (b *Builder) expr(e sqlparser.Expr) string {
 	switch parsedExpr := e.(type) {
 	case *sqlparser.ComparisonExpr:
 		return fmt.Sprintf("%s %s %s", b.expr(parsedExpr.Left), parsedExpr.Operator, b.expr(parsedExpr.Right))
@@ -109,27 +109,27 @@ func (b *builder) expr(e sqlparser.Expr) string {
 func getConvertTypeQualifier(t *sqlparser.ConvertType) string {
 	qualifier := strings.ToUpper(t.Type)
 	switch qualifier {
-	case ConvertTypeBinary:
+	case convertTypeBinary:
 		fallthrough
-	case ConvertTypeChar:
+	case convertTypeChar:
 		// only length
 		if t.Length != nil {
 			v := valTypeFormat(t.Length.Type, t.Length.Val)
 			return formatConvertTypeQualifierFormat(fmt.Sprintf("%s(%s)", qualifier, v))
 		}
 		return formatConvertTypeQualifierFormat(qualifier)
-	case ConvertTypeDate:
+	case convertTypeDate:
 		fallthrough
-	case ConvertTypeDatetime:
+	case convertTypeDatetime:
 		fallthrough
-	case ConvertTypeTime:
+	case convertTypeTime:
 		fallthrough
-	case ConvertTypeSigned:
+	case convertTypeSigned:
 		fallthrough
-	case ConvertTypeUnsigned:
+	case convertTypeUnsigned:
 		// only qualifier
 		return formatConvertTypeQualifierFormat(qualifier)
-	case ConvertTypeDecimal:
+	case convertTypeDecimal:
 		// only decimal
 		length := ""
 		if t.Length != nil {
@@ -149,7 +149,7 @@ func getConvertTypeQualifier(t *sqlparser.ConvertType) string {
 	return ""
 }
 
-func (b *builder) getFuncExpr(funcExpr *sqlparser.FuncExpr) string {
+func (b *Builder) getFuncExpr(funcExpr *sqlparser.FuncExpr) string {
 	funcType := funcExpr.Name.String()
 	strExprs := make([]string, 0)
 	for _, expr := range funcExpr.Exprs {
@@ -157,45 +157,45 @@ func (b *builder) getFuncExpr(funcExpr *sqlparser.FuncExpr) string {
 	}
 
 	switch strings.ToUpper(funcType) {
-	case Avg:
+	case avg:
 		fallthrough
-	case BitAnd:
+	case bitAnd:
 		fallthrough
-	case BitOr:
+	case bitOr:
 		fallthrough
-	case BitXor:
+	case bitXor:
 		fallthrough
-	case Count:
+	case count:
 		fallthrough
-	case CountDistinct:
+	case countDistinct:
 		fallthrough
-	case GroupConcat: // TODO not tried
+	case groupConcat: // TODO not tried
 		fallthrough
-	case Max:
+	case max:
 		fallthrough
-	case Min:
+	case min:
 		fallthrough
-	case Std:
+	case std:
 		fallthrough
-	case StdDev:
+	case stdDev:
 		fallthrough
-	case StdDevPop:
+	case stdDevPop:
 		fallthrough
-	case StdDevSamp:
+	case stdDevSamp:
 		fallthrough
-	case VarPop:
+	case varPop:
 		fallthrough
-	case VarSamp:
+	case varSamp:
 		fallthrough
-	case Variance:
+	case variance:
 		fallthrough
-	case Now:
+	case now:
 		fallthrough
-	case Concat:
+	case concat:
 		fallthrough
-	case Ifnull:
+	case ifnull:
 		fallthrough
-	case Sum:
+	case sum:
 		if len(strExprs) > 1 {
 			return formatFuncs(strings.ToUpper(funcType), formatSimpleArray(strExprs), funcExpr.Distinct)
 		}
