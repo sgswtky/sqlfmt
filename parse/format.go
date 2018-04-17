@@ -243,3 +243,10 @@ func formatAsTable(tableName, asString, hintType string, hints []string) string 
 	tblName := formatAS(tableName, asString)
 	return formatTable(tblName, hintType, hints)
 }
+
+func formatDBTable(DBName, tableName string) string {
+	if DBName == "" {
+		return tableName
+	}
+	return fmt.Sprintf("%s.%s", DBName, tableName)
+}
