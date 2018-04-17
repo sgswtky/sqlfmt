@@ -1,8 +1,8 @@
 package parse
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 type tuple2String struct {

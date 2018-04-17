@@ -1,8 +1,8 @@
 package parse
 
 import (
-	"github.com/sgswtky/sqlparser"
 	"fmt"
+	"github.com/sgswtky/sqlparser"
 )
 
 func valTypeFormat(valType sqlparser.ValType, body []byte) string {

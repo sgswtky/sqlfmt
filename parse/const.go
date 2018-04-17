@@ -9,44 +9,44 @@ const (
 )
 
 const (
-	Dual = "dual"
+	dual = "dual"
 )
 
 const (
-	ConvertTypeBinary   = "BINARY"
-	ConvertTypeChar     = "CHAR"
-	ConvertTypeDate     = "DATE"
-	ConvertTypeDatetime = "DATETIME"
-	ConvertTypeDecimal  = "DECIMAL"
-	ConvertTypeSigned   = "SIGNED"
-	ConvertTypeUnsigned = "UNSIGNED"
-	ConvertTypeTime     = "TIME"
+	convertTypeBinary   = "BINARY"
+	convertTypeChar     = "CHAR"
+	convertTypeDate     = "DATE"
+	convertTypeDatetime = "DATETIME"
+	convertTypeDecimal  = "DECIMAL"
+	convertTypeSigned   = "SIGNED"
+	convertTypeUnsigned = "UNSIGNED"
+	convertTypeTime     = "TIME"
 )
 
 const (
-	Avg           = "AVG"
-	BitAnd        = "BIT_AND"
-	BitOr         = "BIT_OR"
-	BitXor        = "BIT_XOR"
-	Count         = "COUNT"
-	CountDistinct = "COUNT(DISTINCT)" //TODO
-	GroupConcat   = "GROUP_CONCAT"
-	Max           = "MAX"
-	Min           = "MIN"
-	Std           = "STD"
-	StdDev        = "STDDEV"
-	StdDevPop     = "STDDEV_POP"
-	StdDevSamp    = "STDDEV_SAMP"
-	Sum           = "SUM"
-	VarPop        = "VAR_POP"
-	VarSamp       = "VAR_SAMP"
-	Variance      = "VARIANCE"
-	Now           = "NOW"
-	Concat        = "CONCAT"
-	Ifnull        = "IFNULL"
+	avg           = "AVG"
+	bitAnd        = "BIT_AND"
+	bitOr         = "BIT_OR"
+	bitXor        = "BIT_XOR"
+	count         = "COUNT"
+	countDistinct = "COUNT(DISTINCT)" //TODO
+	groupConcat   = "GROUP_CONCAT"
+	max           = "MAX"
+	min           = "MIN"
+	std           = "STD"
+	stdDev        = "STDDEV"
+	stdDevPop     = "STDDEV_POP"
+	stdDevSamp    = "STDDEV_SAMP"
+	sum           = "SUM"
+	varPop        = "VAR_POP"
+	varSamp       = "VAR_SAMP"
+	variance      = "VARIANCE"
+	now           = "NOW"
+	concat        = "CONCAT"
+	ifnull        = "IFNULL"
 )
 
 const (
-	ASC  = "ASC"
-	DESC = "DESC"
+	asc  = "ASC"
+	desc = "DESC"
 )

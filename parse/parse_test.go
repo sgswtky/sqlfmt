@@ -1,8 +1,8 @@
 package parse
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestComments(t *testing.T) {

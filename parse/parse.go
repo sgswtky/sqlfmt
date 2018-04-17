@@ -4,19 +4,22 @@ import (
 	"github.com/sgswtky/sqlparser"
 )
 
-type builder struct {
+// Builder Structure for SQL parsing.
+type Builder struct {
 	initialSQL  string
 	changedSQL  string
 	indentLevel int
 }
 
-func NewBuilder(initialSQL string) *builder {
-	return &builder{
+// NewBuilder Get the parsed SQL builder.
+func NewBuilder(initialSQL string) *Builder {
+	return &Builder{
 		initialSQL: initialSQL,
 	}
 }
 
-func (b *builder) Parse() (string, error) {
+// Parse Parses the SQL passed at builder creation to formatted SQL.
+func (b *Builder) Parse() (string, error) {
 	stmt, err := sqlparser.Parse(b.initialSQL)
 	if err != nil {
 		return "", err
@@ -24,7 +27,7 @@ func (b *builder) Parse() (string, error) {
 	return b.statementRoot(stmt), nil
 }
 
-func (b *builder) statementRoot(statement sqlparser.Statement) string {
+func (b *Builder) statementRoot(statement sqlparser.Statement) string {
 	switch parsedStmt := statement.(type) {
 	case *sqlparser.Select:
 		return b.stmtSelect(parsedStmt)
