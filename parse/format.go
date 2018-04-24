@@ -95,8 +95,8 @@ func formatIS(target, operate string) string {
 
 func formatBetween(left, from, to, operate string) string {
 	return fmt.Sprintf("%s %s %s AND %s",
-		strings.ToUpper(operate),
 		left,
+		strings.ToUpper(operate),
 		from,
 		to)
 }
