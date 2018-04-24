@@ -187,7 +187,7 @@ func formatFuncs(funcs, val string, isDistinct bool) string {
 	if isDistinct {
 		return fmt.Sprintf("%s(DISTINCT %s)", funcs, val)
 	}
-	return fmt.Sprintf("%s %s", funcs, val)
+	return fmt.Sprintf("%s%s", funcs, val)
 }
 
 func formatGroupConcat(distinct string, values []string, orderBy, separator string) string {
