@@ -2,9 +2,7 @@ select account_name, count(*) c from accounts as u group by account_name
 --------------------------------------------------
 SELECT
   account_name,
-  COUNT (*) AS c
+  COUNT(*) AS c
 FROM
   accounts AS u
-GROUP BY(
-  account_name
-)
+GROUP BY account_name
