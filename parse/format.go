@@ -249,3 +249,7 @@ func formatDBTable(DBName, tableName string) string {
 	}
 	return fmt.Sprintf("%s.%s", DBName, tableName)
 }
+
+func formatBinaly(operator, left, right string) string {
+	return fmt.Sprintf("%s %s %s", left, strings.ToUpper(operator), right)
+}
