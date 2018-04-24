@@ -95,8 +95,8 @@ func formatIS(target, operate string) string {
 
 func formatBetween(left, from, to, operate string) string {
 	return fmt.Sprintf("%s %s %s AND %s",
-		strings.ToUpper(operate),
 		left,
+		strings.ToUpper(operate),
 		from,
 		to)
 }
@@ -140,7 +140,7 @@ func formatJoin(format, leftExpr, rightStr, condition string) string {
 }
 
 func formatGroupBy(groupBys []string) string {
-	return fmt.Sprintf("GROUP BY(\n%s\n)", linesIndent(strings.Join(groupBys, ",\n")))
+	return fmt.Sprintf("GROUP BY %s", strings.Join(groupBys, ", "))
 }
 
 func formatHaving(wheres string) string {
@@ -187,7 +187,7 @@ func formatFuncs(funcs, val string, isDistinct bool) string {
 	if isDistinct {
 		return fmt.Sprintf("%s(DISTINCT %s)", funcs, val)
 	}
-	return fmt.Sprintf("%s %s", funcs, val)
+	return fmt.Sprintf("%s%s", funcs, val)
 }
 
 func formatGroupConcat(distinct string, values []string, orderBy, separator string) string {
@@ -248,4 +248,8 @@ func formatDBTable(DBName, tableName string) string {
 		return tableName
 	}
 	return fmt.Sprintf("%s.%s", DBName, tableName)
+}
+
+func formatBinaly(operator, left, right string) string {
+	return fmt.Sprintf("%s %s %s", left, strings.ToUpper(operator), right)
 }

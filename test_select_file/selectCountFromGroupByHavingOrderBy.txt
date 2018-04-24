@@ -2,12 +2,10 @@ select account_name, count(*) as c from accounts group by account_name having c 
 --------------------------------------------------
 SELECT
   account_name,
-  COUNT (*) AS c
+  COUNT(*) AS c
 FROM
   accounts
-GROUP BY(
-  account_name
-)
+GROUP BY account_name
 HAVING
   c > 1
 ORDER BY c DESC, account_name

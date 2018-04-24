@@ -47,9 +47,8 @@ func (b *Builder) expr(e sqlparser.Expr) string {
 		//case *sqlparser.ListArg:
 		//	// TODO cording
 		//	fmt.Println("*sqlparser.ListArg")
-		//case *sqlparser.BinaryExpr:
-		//	// TODO cording
-		//	fmt.Println("*sqlparser.BinaryExpr")
+	case *sqlparser.BinaryExpr:
+		return formatBinaly(parsedExpr.Operator, b.expr(parsedExpr.Left), b.expr(parsedExpr.Right))
 	case *sqlparser.UnaryExpr:
 		return formatUnary(parsedExpr.Operator, b.expr(parsedExpr.Expr))
 		//case *sqlparser.IntervalExpr:
