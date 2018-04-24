@@ -140,7 +140,7 @@ func formatJoin(format, leftExpr, rightStr, condition string) string {
 }
 
 func formatGroupBy(groupBys []string) string {
-	return fmt.Sprintf("GROUP BY(\n%s\n)", linesIndent(strings.Join(groupBys, ",\n")))
+	return fmt.Sprintf("GROUP BY %s", strings.Join(groupBys, ", "))
 }
 
 func formatHaving(wheres string) string {
