@@ -194,6 +194,8 @@ func (b *Builder) getFuncExpr(funcExpr *sqlparser.FuncExpr) string {
 		fallthrough
 	case ifnull:
 		fallthrough
+	case round:
+		fallthrough
 	case sum:
 		if len(strExprs) > 1 {
 			return formatFuncs(strings.ToUpper(funcType), formatSimpleArray(strExprs), funcExpr.Distinct)

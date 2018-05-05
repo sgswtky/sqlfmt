@@ -44,6 +44,7 @@ const (
 	now           = "NOW"
 	concat        = "CONCAT"
 	ifnull        = "IFNULL"
+	round         = "ROUND"
 )
 
 const (
