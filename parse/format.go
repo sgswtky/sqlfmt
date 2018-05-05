@@ -71,17 +71,9 @@ func formatSelect(cache string, columns []string, distinct string, table []strin
 	return selectSQL
 }
 
-func isDual(tables []string) bool {
-	return stringsContains(tables, dual)
-}
-
 func formatWhere(where string) string {
 	return fmt.Sprintf(`WHERE
 %s`, linesIndent(where))
-}
-
-func addIndent(str string) string {
-	return strings.Replace(str, "\n", "\n  ", -1)
 }
 
 func formatParenthesis(s string) string {

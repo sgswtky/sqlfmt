@@ -27,3 +27,11 @@ func stringsContains(strs []string, str string) bool {
 	}
 	return false
 }
+
+func isDual(tables []string) bool {
+	return stringsContains(tables, dual)
+}
+
+func addIndent(str string) string {
+	return strings.Replace(str, "\n", "\n  ", -1)
+}
