@@ -4,6 +4,7 @@ import (
 	"testing"
 	"github.com/sgswtky/sqlparser"
 	"fmt"
+	"strings"
 )
 
 func TestGetConvertTypeQualifier(t *testing.T) {
@@ -96,5 +97,62 @@ func TestGetConvertTypeQualifier(t *testing.T) {
 	result := getConvertTypeQualifier(zeroConvertType)
 	if result != expect {
 		t.Fatal(expectFmt(expect, result))
+	}
+}
+
+func TestGetFuncExpr(t *testing.T) {
+	var builder Builder = &BuilderStruct{}
+	constFunc := []string{
+		avg, bitAnd, bitOr, bitXor, count, countDistinct,
+		groupConcat, max, min, std, stdDev, stdDevPop,
+		stdDevSamp, varPop, varSamp, variance, now, concat, ifnull, round, sum,
+	}
+
+	for _, v := range constFunc {
+		// single expr
+		funcExpr := &sqlparser.FuncExpr{
+			Name:     sqlparser.NewColIdent(v),
+			Distinct: false,
+			Exprs: []sqlparser.SelectExpr{
+				&sqlparser.StarExpr{
+					TableName: sqlparser.TableName{
+						Name: sqlparser.NewTableIdent("table1"),
+					},
+				},
+			},
+		}
+		expect := formatFuncs(strings.ToUpper(v), fmt.Sprintf("(%s)", strings.Join([]string{"table1"}, "")), funcExpr.Distinct)
+		result := builder.getFuncExpr(funcExpr)
+
+		if expect != result {
+			t.Fatal(expectFmt(expect, result))
+		}
+
+		// multiple exprs
+		funcExprs := &sqlparser.FuncExpr{
+			Name:     sqlparser.NewColIdent(v),
+			Distinct: false,
+			Exprs: []sqlparser.SelectExpr{
+				&sqlparser.StarExpr{
+					TableName: sqlparser.TableName{
+						Name: sqlparser.NewTableIdent("table1"),
+					},
+				},
+				&sqlparser.StarExpr{
+					TableName: sqlparser.TableName{
+						Name: sqlparser.NewTableIdent("table2"),
+					},
+				},
+			},
+		}
+		expectExprs := formatFuncs(
+			strings.ToUpper(funcExprs.Name.String()),
+			formatSimpleArray([]string{"table1", "table2"}),
+			funcExpr.Distinct,
+		)
+		resultExprs := builder.getFuncExpr(funcExprs)
+		if expectExprs != resultExprs {
+			t.Fatal(expectFmt(expect, result))
+		}
 	}
 }
