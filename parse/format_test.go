@@ -1,13 +1,8 @@
 package parse
 
 import (
-	"fmt"
 	"testing"
 )
-
-func expectFmt(expect, result interface{}) string {
-	return fmt.Sprintf("expect: `%v` but result: `%v`", expect, result)
-}
 
 func TestFormatAs(t *testing.T) {
 	const expect = "user_id AS uid"

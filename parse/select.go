@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (b *Builder) stmtSelect(stmt *sqlparser.Select) string {
+func (b *BuilderStruct) stmtSelect(stmt *sqlparser.Select) string {
 
 	selectColumns := make([]string, 0)
 	froms := make([]string, 0)
@@ -55,7 +55,7 @@ func (b *Builder) stmtSelect(stmt *sqlparser.Select) string {
 	return formatSelect(stmt.Cache, selectColumns, stmt.Distinct, froms, wheres, groupBy, having, orderBy, limit, lock)
 }
 
-func (b *Builder) columns(exprs sqlparser.SelectExprs) []string {
+func (b *BuilderStruct) columns(exprs sqlparser.SelectExprs) []string {
 	selectColumns := make([]string, 0)
 	for _, column := range exprs {
 		switch parsedColumn := column.(type) {
@@ -73,11 +73,11 @@ func (b *Builder) columns(exprs sqlparser.SelectExprs) []string {
 	return selectColumns
 }
 
-func (b *Builder) where(wheres *sqlparser.Where) string {
+func (b *BuilderStruct) where(wheres *sqlparser.Where) string {
 	return formatWhere(b.expr(wheres.Expr))
 }
 
-func (b *Builder) groupBy(g sqlparser.GroupBy) string {
+func (b *BuilderStruct) groupBy(g sqlparser.GroupBy) string {
 	result := make([]string, 0)
 	for _, v := range g {
 		result = append(result, b.expr(v))
@@ -85,12 +85,12 @@ func (b *Builder) groupBy(g sqlparser.GroupBy) string {
 	return formatGroupBy(result)
 }
 
-func (b *Builder) having(h *sqlparser.Where) string {
+func (b *BuilderStruct) having(h *sqlparser.Where) string {
 	// TODO type
 	return formatHaving(b.expr(h.Expr))
 }
 
-func (b *Builder) orderBy(o sqlparser.OrderBy) string {
+func (b *BuilderStruct) orderBy(o sqlparser.OrderBy) string {
 	tuples := make([]*tuple2String, 0)
 	for _, v := range o {
 		tuples = append(tuples,
@@ -102,7 +102,7 @@ func (b *Builder) orderBy(o sqlparser.OrderBy) string {
 	return formatOrderBy(tuples)
 }
 
-func (b *Builder) limit(l *sqlparser.Limit) string {
+func (b *BuilderStruct) limit(l *sqlparser.Limit) string {
 	limit := ""
 	offset := ""
 	if l.Rowcount != nil {
@@ -114,11 +114,11 @@ func (b *Builder) limit(l *sqlparser.Limit) string {
 	return formatLimit(limit, offset)
 }
 
-func (b *Builder) lock(l string) string {
+func (b *BuilderStruct) lock(l string) string {
 	return strings.ToUpper(l)
 }
 
-func (b *Builder) tableExpr(expr sqlparser.TableExpr) string {
+func (b *BuilderStruct) tableExpr(expr sqlparser.TableExpr) string {
 	switch parsedExpr := expr.(type) {
 	case *sqlparser.AliasedTableExpr:
 		tableName := b.simpleTableExpr(parsedExpr.Expr)
@@ -151,7 +151,7 @@ func (b *Builder) tableExpr(expr sqlparser.TableExpr) string {
 	return ""
 }
 
-func (b *Builder) simpleTableExpr(expr sqlparser.SimpleTableExpr) string {
+func (b *BuilderStruct) simpleTableExpr(expr sqlparser.SimpleTableExpr) string {
 	switch parsedExpr := expr.(type) {
 	case sqlparser.TableName:
 		return formatDBTable(parsedExpr.Qualifier.String(), parsedExpr.Name.String())
@@ -163,7 +163,7 @@ func (b *Builder) simpleTableExpr(expr sqlparser.SimpleTableExpr) string {
 	return ""
 }
 
-func (b *Builder) selectStatement(selectStmt sqlparser.SelectStatement) string {
+func (b *BuilderStruct) selectStatement(selectStmt sqlparser.SelectStatement) string {
 	switch parsedSelectStatement := selectStmt.(type) {
 	case *sqlparser.Select:
 		return b.stmtSelect(parsedSelectStatement)
@@ -178,7 +178,7 @@ func (b *Builder) selectStatement(selectStmt sqlparser.SelectStatement) string {
 	return ""
 }
 
-func (b *Builder) selectExprs(selectExprs sqlparser.SelectExprs) []string {
+func (b *BuilderStruct) selectExprs(selectExprs sqlparser.SelectExprs) []string {
 	result := make([]string, 0)
 	for _, selectExpr := range selectExprs {
 		result = append(result, b.selectExpr(selectExpr))
@@ -186,7 +186,7 @@ func (b *Builder) selectExprs(selectExprs sqlparser.SelectExprs) []string {
 	return result
 }
 
-func (b *Builder) selectExpr(selectExpr sqlparser.SelectExpr) string {
+func (b *BuilderStruct) selectExpr(selectExpr sqlparser.SelectExpr) string {
 	switch parsedSelectExpr := selectExpr.(type) {
 	case *sqlparser.StarExpr:
 		// pattern of 'COUNT(*)'
@@ -203,7 +203,7 @@ func (b *Builder) selectExpr(selectExpr sqlparser.SelectExpr) string {
 	return ""
 }
 
-func (b *Builder) asterOption(str string) string {
+func (b *BuilderStruct) asterOption(str string) string {
 	if str == "" {
 		return "*"
 	}

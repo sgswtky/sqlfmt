@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (b *Builder) expr(e sqlparser.Expr) string {
+func (b *BuilderStruct) expr(e sqlparser.Expr) string {
 	switch parsedExpr := e.(type) {
 	case *sqlparser.ComparisonExpr:
 		return fmt.Sprintf("%s %s %s", b.expr(parsedExpr.Left), parsedExpr.Operator, b.expr(parsedExpr.Right))
@@ -148,12 +148,9 @@ func getConvertTypeQualifier(t *sqlparser.ConvertType) string {
 	return ""
 }
 
-func (b *Builder) getFuncExpr(funcExpr *sqlparser.FuncExpr) string {
+func (b *BuilderStruct) getFuncExpr(funcExpr *sqlparser.FuncExpr) string {
 	funcType := funcExpr.Name.String()
-	strExprs := make([]string, 0)
-	for _, expr := range funcExpr.Exprs {
-		strExprs = append(strExprs, b.selectExpr(expr))
-	}
+	strExprs := b.selectExprs(funcExpr.Exprs)
 
 	switch strings.ToUpper(funcType) {
 	case avg:
@@ -203,6 +200,28 @@ func (b *Builder) getFuncExpr(funcExpr *sqlparser.FuncExpr) string {
 		return formatFuncs(strings.ToUpper(funcType), fmt.Sprintf("(%s)", strings.Join(strExprs, "")), funcExpr.Distinct)
 	default:
 		unknownType(funcType)
+	}
+	return ""
+}
+
+func valTypeFormat(valType sqlparser.ValType, body []byte) string {
+	switch valType {
+	case sqlparser.StrVal:
+		return fmt.Sprintf("\"%s\"", string(body))
+	case sqlparser.IntVal:
+		fallthrough
+	case sqlparser.FloatVal:
+		fallthrough
+	case sqlparser.HexNum:
+		fallthrough
+	case sqlparser.HexVal:
+		fallthrough
+	case sqlparser.ValArg:
+		fallthrough
+	case sqlparser.BitVal:
+		return string(body)
+	default:
+		unknownType(valType)
 	}
 	return ""
 }
