@@ -15,6 +15,10 @@ const (
 	splitAreaString = "--------------------------------------------------\n"
 )
 
+func expectFmt(expect, result interface{}) string {
+	return fmt.Sprintf("expect: `%v` but result: `%v`", expect, result)
+}
+
 func TestSelectSQLFmt(t *testing.T) {
 	filepath.Walk("test_select_file/", func(path string, info os.FileInfo, err error) error {
 		fmt.Println(path)
@@ -79,13 +83,13 @@ import "fmt"
 
 func main() {
 	// sqlfmt
-	sql := `+"`", `
+	sql := `+ "`", `
 SELECT
   *
 FROM
   user
   LEFT JOIN userb
-    ON user.user_id = userb.user_id`+"`", `
+    ON user.user_id = userb.user_id`+ "`", `
 	fmt.Println(sql)
 }
 
@@ -94,5 +98,19 @@ FROM
 	if expect != buff.String() {
 		fmt.Println(buff.String())
 		t.Fatal("assert error.")
+	}
+}
+
+func TestIsFmtTargetComment(t *testing.T) {
+	expectComment := true
+	resultComment := isFmtTargetComment("// " + commentConst)
+	if resultComment != expectComment {
+		t.Fatal(expectFmt(expectComment, resultComment))
+	}
+
+	expectNonComment := false
+	resultNonComment := isFmtTargetComment("// aaaa")
+	if resultNonComment != expectNonComment {
+		t.Fatal(expectFmt(expectNonComment, resultNonComment))
 	}
 }
