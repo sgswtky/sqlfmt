@@ -1,4 +1,4 @@
-package parse
+package main
 
 import (
 	"github.com/sgswtky/sqlparser"
@@ -55,7 +55,6 @@ func (b *BuilderStruct) statementRoot(statement sqlparser.Statement) string {
 	case *sqlparser.Union:
 		return b.selectStatement(parsedStmt)
 	default:
-		unknownType(parsedStmt)
+		return unsupportedType(parsedStmt)
 	}
-	return ""
 }

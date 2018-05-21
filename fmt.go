@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/sgswtky/sqlfmt/parse"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -14,7 +13,7 @@ import (
 )
 
 func fmtSQL(sql string, w io.Writer, mode int) error {
-	builder := parse.NewBuilder(sql)
+	builder := NewBuilder(sql)
 	result, err := builder.Parse()
 	if err != nil {
 		return err
@@ -52,16 +51,20 @@ func parseAssignStmt(assignStmt *ast.AssignStmt) error {
 			return errors.New("unknown error")
 		}
 
-		if ident.Name == variableName {
-			sqlRune := []rune(basicLit.Value)
-			trimSQL := string(sqlRune[1 : len(sqlRune)-1])
-			builder := parse.NewBuilder(trimSQL)
-			sql, err := builder.Parse()
-			if err != nil {
-				return err
-			}
-			basicLit.Value = fmt.Sprintf("`\n%s`", sql)
+		if err := replaceFormatedSQL(basicLit, ident); err != nil {
+			return err
 		}
+	}
+	return nil
+}
+
+func replaceFormatedSQL(basicLit *ast.BasicLit, ident *ast.Ident) error {
+	if ident.Name == variableName {
+		sqlRune := []rune(basicLit.Value)
+		trimSQL := string(sqlRune[1: len(sqlRune)-1])
+		sql, err := NewBuilder(trimSQL).Parse()
+		basicLit.Value = fmt.Sprintf("`\n%s`", sql)
+		return err
 	}
 	return nil
 }

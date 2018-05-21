@@ -3,55 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/sgswtky/sqlfmt/parse"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strings"
 	"testing"
+	"go/ast"
 )
-
-const (
-	splitAreaString = "--------------------------------------------------\n"
-)
-
-func TestSelectSQLFmt(t *testing.T) {
-	filepath.Walk("test_select_file/", func(path string, info os.FileInfo, err error) error {
-		fmt.Println(path)
-		// not work if directory
-		if info.IsDir() {
-			return nil
-		}
-
-		b, err := ioutil.ReadFile(path)
-		strs := strings.Split(string(b), splitAreaString)
-		if len(strs) < 2 {
-			t.Error("require source and answer")
-		}
-		if err != nil {
-			t.Error(err)
-		}
-		source := strs[0]
-		answer := strs[1]
-
-		builder := parse.NewBuilder(source)
-		sql, err := builder.Parse()
-
-		if err != nil {
-			t.Error(err)
-		}
-
-		if sql != answer {
-			errMsg := fmt.Sprintf(">>>> file answer >>>>>>>>\n%s\n--------------------------------------------------\n%s\n<<<< formatted SQL <<<<<<<<",
-				answer,
-				sql)
-			fmt.Println(errMsg)
-			t.Error("failure, not expected string.")
-		}
-		return nil
-	})
-
-}
 
 func TestReplaceGoFile(t *testing.T) {
 	gofile := `
@@ -79,13 +33,13 @@ import "fmt"
 
 func main() {
 	// sqlfmt
-	sql := `+"`", `
+	sql := `+ "`", `
 SELECT
   *
 FROM
   user
   LEFT JOIN userb
-    ON user.user_id = userb.user_id`+"`", `
+    ON user.user_id = userb.user_id`+ "`", `
 	fmt.Println(sql)
 }
 
@@ -94,5 +48,102 @@ FROM
 	if expect != buff.String() {
 		fmt.Println(buff.String())
 		t.Fatal("assert error.")
+	}
+}
+
+func TestIsFmtTargetComment(t *testing.T) {
+	expectComment := true
+	resultComment := isFmtTargetComment("// " + commentConst)
+	if resultComment != expectComment {
+		t.Fatal(expectFmt(expectComment, resultComment))
+	}
+
+	expectNonComment := false
+	resultNonComment := isFmtTargetComment("// aaaa")
+	if resultNonComment != expectNonComment {
+		t.Fatal(expectFmt(expectNonComment, resultNonComment))
+	}
+}
+
+func TestGetBasicLit(t *testing.T) {
+	basicLit := &ast.BasicLit{
+		Value: "",
+	}
+	expectBasicLit := basicLit
+	resultBasicLit := getBasicLit([]ast.Expr{basicLit})
+	if resultBasicLit != expectBasicLit {
+		t.Fatal(expectFmt(expectBasicLit, resultBasicLit))
+	}
+
+	nonBasicLit := &ast.FuncLit{}
+	var expectNonBasicLit *ast.BasicLit = nil
+	resultNonBasicLit := getBasicLit([]ast.Expr{nonBasicLit})
+	if resultNonBasicLit != expectNonBasicLit {
+		t.Fatal(expectFmt(expectNonBasicLit, resultNonBasicLit))
+	}
+}
+
+func TestGetIdent(t *testing.T) {
+	ident := &ast.Ident{
+		Name: "",
+	}
+	expectIdent := ident
+	resultIdent := getIdent([]ast.Expr{ident})
+	if resultIdent != expectIdent {
+		t.Fatal(expectFmt(expectIdent, resultIdent))
+	}
+
+	nonIdent := &ast.FuncLit{}
+	var expectNonIdent *ast.Ident = nil
+	resultNonIdent := getIdent([]ast.Expr{nonIdent})
+	if resultNonIdent != expectNonIdent {
+		t.Fatal(expectFmt(expectNonIdent, resultNonIdent))
+	}
+}
+
+func TestParseAssignStmt(t *testing.T) {
+
+	ident := &ast.Ident{
+		NamePos: 55,
+		Name:    "sql",
+		Obj: &ast.Object{
+			Kind: 4,
+			Name: "sql",
+			Decl: &ast.AssignStmt{},
+			Data: nil,
+			Type: nil,
+		},
+	}
+	initialValue := "`select * from example`"
+	basicLit := &ast.BasicLit{
+		ValuePos: 62,
+		Kind:     9,
+		Value:    initialValue,
+	}
+	var expect error = nil
+	result := replaceFormatedSQL(basicLit, ident)
+	if result != expect {
+		t.Fatal(expectFmt(expect, result))
+	}
+	// expect, changed basicLit Value
+	if basicLit.Value == initialValue {
+		t.Fatal("basicLit and initialValue is it should not be the same")
+	}
+
+	identNotTarget := ident
+	ident.Name = "non target comment"
+	basicLitNotTarget := &ast.BasicLit{
+		ValuePos: 62,
+		Kind:     9,
+		Value:    initialValue,
+	}
+	var expectNotTarget error = nil
+	resultNotTarget := replaceFormatedSQL(basicLitNotTarget, identNotTarget)
+	if resultNotTarget != expectNotTarget {
+		t.Fatal(expectFmt(expectNotTarget, resultNotTarget))
+	}
+	// expect, not changed basicLit Value
+	if basicLitNotTarget.Value != initialValue {
+		t.Fatal("basicLit to should not be write")
 	}
 }
