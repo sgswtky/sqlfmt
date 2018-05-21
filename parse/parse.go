@@ -55,7 +55,7 @@ func (b *BuilderStruct) statementRoot(statement sqlparser.Statement) string {
 	case *sqlparser.Union:
 		return b.selectStatement(parsedStmt)
 	default:
-		unknownType(parsedStmt)
+		unsupportedType(parsedStmt)
 	}
 	return ""
 }
