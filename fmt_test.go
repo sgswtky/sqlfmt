@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/sgswtky/sqlfmt/parse"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -15,10 +14,6 @@ import (
 const (
 	splitAreaString = "--------------------------------------------------\n"
 )
-
-func expectFmt(expect, result interface{}) string {
-	return fmt.Sprintf("expect: `%v` but result: `%v`", expect, result)
-}
 
 func TestSelectSQLFmt(t *testing.T) {
 	filepath.Walk("test_select_file/", func(path string, info os.FileInfo, err error) error {
@@ -39,7 +34,7 @@ func TestSelectSQLFmt(t *testing.T) {
 		source := strs[0]
 		answer := strs[1]
 
-		builder := parse.NewBuilder(source)
+		builder := NewBuilder(source)
 		sql, err := builder.Parse()
 
 		if err != nil {

@@ -1,4 +1,4 @@
-package parse
+package main
 
 const (
 	as  = "AS"

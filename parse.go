@@ -1,4 +1,4 @@
-package parse
+package main
 
 import (
 	"github.com/sgswtky/sqlparser"
