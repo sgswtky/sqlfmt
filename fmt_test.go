@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"go/ast"
 )
 
 const (
@@ -112,5 +113,41 @@ func TestIsFmtTargetComment(t *testing.T) {
 	resultNonComment := isFmtTargetComment("// aaaa")
 	if resultNonComment != expectNonComment {
 		t.Fatal(expectFmt(expectNonComment, resultNonComment))
+	}
+}
+
+func TestGetBasicLit(t *testing.T) {
+	basicLit := &ast.BasicLit{
+		Value: "",
+	}
+	expectBasicLit := basicLit
+	resultBasicLit := getBasicLit([]ast.Expr{basicLit})
+	if resultBasicLit != expectBasicLit {
+		t.Fatal(expectFmt(expectBasicLit, resultBasicLit))
+	}
+
+	nonBasicLit := &ast.FuncLit{}
+	var expectNonBasicLit *ast.BasicLit = nil
+	resultNonBasicLit := getBasicLit([]ast.Expr{nonBasicLit})
+	if resultNonBasicLit != expectNonBasicLit {
+		t.Fatal(expectFmt(expectNonBasicLit, resultNonBasicLit))
+	}
+}
+
+func TestGetIdent(t *testing.T) {
+	ident := &ast.Ident{
+		Name: "",
+	}
+	expectIdent := ident
+	resultIdent := getIdent([]ast.Expr{ident})
+	if resultIdent != expectIdent {
+		t.Fatal(expectFmt(expectIdent, resultIdent))
+	}
+
+	nonIdent := &ast.FuncLit{}
+	var expectNonIdent *ast.Ident = nil
+	resultNonIdent := getIdent([]ast.Expr{nonIdent})
+	if resultNonIdent != expectNonIdent {
+		t.Fatal(expectFmt(expectNonIdent, resultNonIdent))
 	}
 }
