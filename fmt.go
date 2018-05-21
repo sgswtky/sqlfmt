@@ -51,16 +51,20 @@ func parseAssignStmt(assignStmt *ast.AssignStmt) error {
 			return errors.New("unknown error")
 		}
 
-		if ident.Name == variableName {
-			sqlRune := []rune(basicLit.Value)
-			trimSQL := string(sqlRune[1: len(sqlRune)-1])
-			builder := NewBuilder(trimSQL)
-			sql, err := builder.Parse()
-			if err != nil {
-				return err
-			}
-			basicLit.Value = fmt.Sprintf("`\n%s`", sql)
+		if err := replaceFormatedSQL(basicLit, ident); err != nil {
+			return err
 		}
+	}
+	return nil
+}
+
+func replaceFormatedSQL(basicLit *ast.BasicLit, ident *ast.Ident) error {
+	if ident.Name == variableName {
+		sqlRune := []rune(basicLit.Value)
+		trimSQL := string(sqlRune[1: len(sqlRune)-1])
+		sql, err := NewBuilder(trimSQL).Parse()
+		basicLit.Value = fmt.Sprintf("`\n%s`", sql)
+		return err
 	}
 	return nil
 }

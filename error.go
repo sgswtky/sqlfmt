@@ -14,7 +14,7 @@ func unknownType(i interface{}) {
 	fmt.Println("----------------------")
 }
 
-func unsupportedType(i interface{}) {
+func unsupportedType(i interface{}) string {
 	fmt.Println("----------------------")
 	fmt.Println("Support for select statement only.")
 	fmt.Println("If in the case of select statement looked this error, there is a possibility of a bug.")
@@ -22,6 +22,7 @@ func unsupportedType(i interface{}) {
 	fmt.Println(fmt.Sprintf("unknown value: %+v", i))
 	printRuntime()
 	fmt.Println("----------------------")
+	return ""
 }
 
 func printRuntime() {
