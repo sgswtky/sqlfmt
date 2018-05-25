@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"flag"
 	"fmt"
 	"golang.org/x/crypto/ssh/terminal"
@@ -16,7 +15,6 @@ var (
 	/**
 	 * execution mode
 	 */
-	executionMode = 0
 
 	pipeStdIn []byte
 
@@ -29,6 +27,8 @@ var (
 	interactiveOpt = flag.Bool("i", false, "interactive mode.")
 	fileOpt        = flag.String("f", "", "file mode.")
 	writeOpt       = flag.Bool("w", false, "overwrite in the case of '-f', '-r'.")
+
+	isTerminal = terminal.IsTerminal
 )
 
 func usage() {
@@ -39,14 +39,16 @@ func usage() {
 func main() {
 	flag.Usage = usage
 	flag.Parse()
-	executionMode = parseMode()
-	if err := exec(); err != nil {
+	executionMode := parseMode()
+	if err := exec(executionMode)(); err != nil {
 		fmt.Println(err)
 	}
 }
 
+type execFunc func() error
+
 func parseMode() int {
-	if !terminal.IsTerminal(0) {
+	if !isTerminal(0) {
 		pipeStdIn, _ = ioutil.ReadAll(os.Stdin)
 		return modePipe
 	}
@@ -63,60 +65,56 @@ func parseMode() int {
 	return modeUnknown
 }
 
-func exec() error {
-	switch executionMode {
-	case modeDialog:
-		return dialogMode()
-	case modeCommand:
-		return fmtSQL(*sqlOpt, os.Stdout, modeCommand)
-	case modeFile:
-		if err := execFileMode(); err != nil {
-			return fmt.Errorf("%s: %s", *fileOpt, err.Error())
-		}
-		return nil
-	case modePipe:
-		return fmtSQL(string(pipeStdIn), os.Stdout, modePipe)
-	case modeFiles:
-	default:
-		// helo mode
-		usage()
-	}
-	return errors.New("please input parameter")
-}
-
-func dialogMode() error {
-	for {
-		str := dialog()
-		if err := fmtSQL(str, os.Stdout, modeDialog); err != nil {
-			return err
-		}
-	}
-}
-
 const (
 	modeUnknown = 0
 	modeDialog  = iota + 1
 	modeCommand
 	modeFile
 	modePipe
-	modeFiles
 )
 
-func dialog() string {
-	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Print("('3') type sql to here: ")
-	for scanner.Scan() {
-		if err := scanner.Err(); err != nil {
-			panic(err)
-		}
-		if text := scanner.Text(); text != "" {
-			return text
-		}
+func exec(mode int) execFunc {
+	switch mode {
+	case modeDialog:
+		return dialogMode
+	case modeCommand:
+		return commandMode
+	case modeFile:
+		return fileMode
+	case modePipe:
+		return pipeMode
+	default:
+		return usageMode
 	}
-	return ""
 }
 
-func execFileMode() error {
+func dialogMode() error {
+	f := func() string {
+		scanner := bufio.NewScanner(os.Stdin)
+		fmt.Print("('3') type sql to here: ")
+		for scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				panic(err)
+			}
+			if text := scanner.Text(); text != "" {
+				return text
+			}
+		}
+		return ""
+	}
+	for {
+		str := f()
+		if err := fmtSQL(str, os.Stdout, modeDialog); err != nil {
+			return err
+		}
+	}
+}
+
+func commandMode() error {
+	return fmtSQL(*sqlOpt, os.Stdout, modeCommand)
+}
+
+func fileMode() error {
 	f, err := os.Open(*fileOpt)
 	if err != nil {
 		return err
@@ -135,6 +133,15 @@ func execFileMode() error {
 			return err
 		}
 	}
+	return nil
+}
+
+func pipeMode() error {
+	return fmtSQL(string(pipeStdIn), os.Stdout, modePipe)
+}
+
+func usageMode() error {
+	usage()
 	return nil
 }
 

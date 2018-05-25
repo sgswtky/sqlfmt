@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"runtime"
 )
 
 type tuple2String struct {
@@ -34,4 +35,22 @@ func isDual(tables []string) bool {
 
 func addIndent(str string) string {
 	return strings.Replace(str, "\n", "\n  ", -1)
+}
+
+func unknownType(i interface{}) string {
+	return unbleToContinueError(i, unknownTypeError)
+}
+
+func unsupportedType(i interface{}) string {
+	return unbleToContinueError(i, unsportedTypeError)
+}
+
+func unbleToContinueError(i interface{}, sentence string) string {
+	fmt.Println("----------------------")
+	fmt.Println(fmt.Sprintf(sentence, i))
+	if _, fileName, line, ok := runtime.Caller(2); ok {
+		fmt.Println(fmt.Sprintf("%s:%d", fileName, line))
+	}
+	fmt.Println("----------------------")
+	return ""
 }

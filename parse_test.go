@@ -33,7 +33,6 @@ func TestSelectSQLFmt(t *testing.T) {
 
 		builder := NewBuilder(source)
 		sql, err := builder.Parse()
-
 		if err != nil {
 			t.Error(err)
 		}
