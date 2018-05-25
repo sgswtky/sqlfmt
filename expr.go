@@ -28,7 +28,7 @@ func (b *BuilderStruct) expr(e sqlparser.Expr) string {
 	case *sqlparser.SQLVal:
 		return valTypeFormat(parsedExpr.Type, parsedExpr.Val)
 	case *sqlparser.NullVal:
-		return "NULL"
+		return null
 	case sqlparser.BoolVal:
 		return fmt.Sprintf("%v", parsedExpr)
 	case *sqlparser.ColName:

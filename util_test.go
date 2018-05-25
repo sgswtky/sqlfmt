@@ -24,6 +24,20 @@ func TestLinesIndent(t *testing.T) {
 	}
 }
 
+func TestIsDual(t *testing.T) {
+	result := isDual([]string{dual})
+	expectTrue := true
+	if result != expectTrue {
+		t.Fatal(expectFmt(expectTrue, result))
+	}
+
+	resultNonDual := isDual([]string{"not_dual"})
+	expectFalse := false
+	if resultNonDual != expectFalse {
+		t.Fatal(expectFmt(expectFalse, result))
+	}
+}
+
 func TestStringsContains(t *testing.T) {
 	// false
 	const expectFalse = false
