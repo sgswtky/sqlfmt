@@ -86,7 +86,6 @@ func (b *BuilderStruct) groupBy(g sqlparser.GroupBy) string {
 }
 
 func (b *BuilderStruct) having(h *sqlparser.Where) string {
-	// TODO type
 	return formatHaving(b.expr(h.Expr))
 }
 
@@ -115,7 +114,7 @@ func (b *BuilderStruct) limit(l *sqlparser.Limit) string {
 }
 
 func (b *BuilderStruct) lock(l string) string {
-	return strings.ToUpper(l)
+	return strings.ToUpper(strings.TrimSpace(l))
 }
 
 func (b *BuilderStruct) selectStatement(selectStmt sqlparser.SelectStatement) string {

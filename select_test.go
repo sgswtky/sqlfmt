@@ -8,6 +8,82 @@ import (
 // The method attached to select confirms only that the expected value is returned from the structure.
 // Essential tests should be done in format if possible.
 
+func TestColumnes(t *testing.T) {
+	columns := sqlparser.SelectExprs{
+		&sqlparser.AliasedExpr{
+			Expr: &sqlparser.ColName{
+				Metadata: nil,
+				Name:     sqlparser.NewColIdent("user_id"),
+				Qualifier: sqlparser.TableName{
+					Name:      sqlparser.NewTableIdent(""),
+					Qualifier: sqlparser.NewTableIdent(""),
+				},
+			},
+			As: sqlparser.NewColIdent(""),
+		},
+		&sqlparser.AliasedExpr{
+			Expr: &sqlparser.ColName{
+				Metadata: nil,
+				Name:     sqlparser.NewColIdent("group_user_name"),
+				Qualifier: sqlparser.TableName{
+					Name:      sqlparser.NewTableIdent(""),
+					Qualifier: sqlparser.NewTableIdent(""),
+				},
+			},
+			As: sqlparser.NewColIdent("user_name"),
+		},
+		&sqlparser.AliasedExpr{
+			Expr: &sqlparser.FuncExpr{
+				Qualifier: sqlparser.NewTableIdent(""),
+				Name:      sqlparser.NewColIdent("count"),
+				Distinct:  false,
+				Exprs: sqlparser.SelectExprs{
+					&sqlparser.StarExpr{
+						TableName: sqlparser.TableName{
+							Name:      sqlparser.NewTableIdent(""),
+							Qualifier: sqlparser.NewTableIdent(""),
+						},
+					},
+				},
+			},
+			As: sqlparser.NewColIdent(""),
+		},
+		&sqlparser.StarExpr{
+			TableName: sqlparser.TableName{
+				Name:      sqlparser.NewTableIdent(""),
+				Qualifier: sqlparser.NewTableIdent(""),
+			},
+		},
+	}
+	result := NewBuilder("").columns(columns)
+	// user_id group_user_name AS user_name COUNT(*) *
+	resultCount := len(result)
+	expectCount := 4
+	if resultCount != expectCount {
+		t.Fatal(expectFmt(expectCount, resultCount))
+	}
+
+	expect0 := "user_id"
+	if result[0] != expect0 {
+		t.Fatal(expectFmt(expect0, result[0]))
+	}
+
+	expect1 := "group_user_name AS user_name"
+	if result[1] != expect1 {
+		t.Fatal(expectFmt(expect1, result[1]))
+	}
+
+	expect2 := "COUNT(*)"
+	if result[2] != expect2 {
+		t.Fatal(expectFmt(expect2, result[2]))
+	}
+
+	expect3 := "*"
+	if result[3] != expect3 {
+		t.Fatal(expectFmt(expect3, result[3]))
+	}
+}
+
 func TestAsterOption(t *testing.T) {
 	builder := NewBuilder("")
 
@@ -213,5 +289,44 @@ func TestLimit(t *testing.T) {
 	onlyLimitExpect := "LIMIT 1"
 	if onlyLimitResult != onlyLimitExpect {
 		t.Fatal(expectFmt(onlyLimitExpect, onlyLimitResult))
+	}
+}
+
+func TestLock(t *testing.T) {
+	lock := "    lock in share mode   "
+	result := NewBuilder("").lock(lock)
+	expect := "LOCK IN SHARE MODE"
+	if result != expect {
+		t.Fatal(expectFmt(expect, result))
+	}
+}
+
+func TestSelect(t *testing.T) {
+	result, err := NewBuilder(`select count(*) as c from users_a, users_b
+where user_type = 3 
+group by user_product 
+having c < 10 
+order by department 
+limit 100 
+lock in share mode`).
+		Parse()
+	if err != nil {
+		t.Fatal(expectFmt("not error.", err))
+	}
+
+	cache := ""
+	columns := []string{"COUNT(*) AS c"}
+	distinct := ""
+	froms := []string{"users_a", "users_b"}
+	wheres := "WHERE\n  user_type = 3"
+	groupBy := "GROUP BY user_product"
+	having := "HAVING\n  c < 10"
+	orderBy := "ORDER BY department"
+	limit := "LIMIT 100"
+	lock := "LOCK IN SHARE MODE"
+	expect := formatSelect(cache, columns, distinct, froms, wheres, groupBy, having, orderBy, limit, lock)
+
+	if result != expect {
+		t.Fatal(expectFmt(expect, result))
 	}
 }
