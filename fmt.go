@@ -8,33 +8,34 @@ import (
 	"go/parser"
 	"go/token"
 	"io"
-	"io/ioutil"
 	"strings"
 )
 
 func fmtSQL(sql string, w io.Writer, mode int) error {
-	builder := NewBuilder(sql)
-	result, err := builder.Parse()
+	result, err := NewBuilder(sql).Parse()
 	if err != nil {
 		return err
 	}
 
-	if mode == modeDialog {
-		// add last line
-		result = fmt.Sprintf("-- >> formated sql\n%s", result)
-		result += "\n"
-		result += fmt.Sprintf("<< -- formated sql\n")
-	}
-	if mode == modeCommand || mode == modePipe {
-		result = fmt.Sprintf("%s\n", result)
-	}
-
-	writeCount, err := fmt.Fprint(w, result)
-	if writeCount != len([]byte(result)) {
+	writeCount, err := fmt.Fprint(w, fmtSQLformat(result, mode))
+	if writeCount != len([]byte(result))+1 {
 		// TODO error message
 		return errors.New("write result byte error")
 	}
 	return err
+}
+
+func fmtSQLformat(result string, mode int) string {
+	switch mode {
+	case modeDialog:
+		return fmt.Sprintf("-- >> formated sql\n%s\n<< -- formated sql \n", result)
+	case modeCommand:
+		fallthrough
+	case modePipe:
+		return fmt.Sprintf("%s\n", result)
+	default:
+		return result
+	}
 }
 
 const (
@@ -73,31 +74,22 @@ func getBasicLit(expr []ast.Expr) *ast.BasicLit {
 	switch parsed := expr[0].(type) {
 	case *ast.BasicLit:
 		return parsed
-	default:
-		return nil
 	}
+	return nil
 }
 
 func getIdent(expr []ast.Expr) *ast.Ident {
 	switch parsed := expr[0].(type) {
 	case *ast.Ident:
 		return parsed
-	default:
-		return nil
 	}
+	return nil
 }
 
 func fmtFile(astFilename string, fileReader io.Reader, fileWriter io.Writer) error {
-
-	// Read source
-	src, err := ioutil.ReadAll(fileReader)
-	if err != nil {
-		return err
-	}
-
 	// Parse ast
 	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, astFilename, src, parser.ParseComments)
+	f, err := parser.ParseFile(fset, astFilename, fileReader, parser.ParseComments)
 	if err != nil {
 		return err
 	}

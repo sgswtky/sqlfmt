@@ -147,3 +147,27 @@ func TestParseAssignStmt(t *testing.T) {
 		t.Fatal("basicLit to should not be write")
 	}
 }
+
+func TestFmtSQLformat(t *testing.T) {
+	resultDialog := fmtSQLformat("SAMPLE", modeDialog)
+	expectDialog := fmt.Sprintf("-- >> formated sql\n%s\n<< -- formated sql \n", "SAMPLE")
+	if resultDialog != expectDialog {
+		t.Fatal(expectFmt(expectDialog, resultDialog))
+	}
+
+	resultCommand := fmtSQLformat("SAMPLE", modeCommand)
+	expectCommand := fmt.Sprintf("%s\n", "SAMPLE")
+	if resultCommand != expectCommand {
+		t.Fatal(expectFmt(expectCommand, resultCommand))
+	}
+
+	resultPipe := fmtSQLformat("SAMPLE", modePipe)
+	expectPipe := fmt.Sprintf("%s\n", "SAMPLE")
+	if resultPipe != expectPipe {
+		t.Fatal(expectFmt(expectPipe, resultPipe))
+	}
+
+	if resultCommand != resultPipe {
+		t.Fatal("expect same value. but, not same value.")
+	}
+}
