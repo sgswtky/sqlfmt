@@ -148,6 +148,36 @@ func TestOrderBy(t *testing.T) {
 	if result != expect {
 		t.Fatal(expectFmt(expect, result))
 	}
+
+	orderByDesc := sqlparser.OrderBy{
+		&sqlparser.Order{
+			Expr: &sqlparser.ColName{
+				Metadata: nil,
+				Name:     sqlparser.NewColIdent("login_count"),
+				Qualifier: sqlparser.TableName{
+					Name:      sqlparser.NewTableIdent(""),
+					Qualifier: sqlparser.NewTableIdent(""),
+				},
+			},
+			Direction: "desc",
+		},
+		&sqlparser.Order{
+			Expr: &sqlparser.ColName{
+				Metadata: nil,
+				Name:     sqlparser.NewColIdent("user_id"),
+				Qualifier: sqlparser.TableName{
+					Name:      sqlparser.NewTableIdent(""),
+					Qualifier: sqlparser.NewTableIdent(""),
+				},
+			},
+			Direction: "desc",
+		},
+	}
+	orderByDescResult := NewBuilder("").orderBy(orderByDesc)
+	orderByDescExpect := "ORDER BY login_count DESC, user_id DESC"
+	if orderByDescResult != orderByDescExpect {
+		t.Fatal(expectFmt(orderByDescExpect, orderByDescResult))
+	}
 }
 
 func TestLimit(t *testing.T) {
@@ -169,5 +199,19 @@ func TestLimit(t *testing.T) {
 	expect := "LIMIT 1 OFFSET 2"
 	if result != expect {
 		t.Fatal(expectFmt(expect, result))
+	}
+
+	onlyLimit := &sqlparser.Limit{
+		Rowcount: &sqlparser.SQLVal{
+			Type: 1,
+			Val: []uint8{
+				0x31,
+			},
+		},
+	}
+	onlyLimitResult := NewBuilder("").limit(onlyLimit)
+	onlyLimitExpect := "LIMIT 1"
+	if onlyLimitResult != onlyLimitExpect {
+		t.Fatal(expectFmt(onlyLimitExpect, onlyLimitResult))
 	}
 }
