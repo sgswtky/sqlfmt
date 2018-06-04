@@ -118,51 +118,6 @@ func (b *BuilderStruct) lock(l string) string {
 	return strings.ToUpper(l)
 }
 
-func (b *BuilderStruct) tableExpr(expr sqlparser.TableExpr) string {
-	switch parsedExpr := expr.(type) {
-	case *sqlparser.AliasedTableExpr:
-		tableName := b.simpleTableExpr(parsedExpr.Expr)
-		hintType := ""
-		hintIndexes := make([]string, 0)
-		if parsedExpr.Hints != nil {
-			hintType = parsedExpr.Hints.Type
-			for _, v := range parsedExpr.Hints.Indexes {
-				hintIndexes = append(hintIndexes, v.String())
-			}
-		}
-		if parsedExpr.As.IsEmpty() {
-			return formatTable(tableName, hintType, hintIndexes)
-		}
-		return formatAsTable(tableName, parsedExpr.As.String(), hintType, hintIndexes)
-	case *sqlparser.ParenTableExpr:
-		r := make([]string, 0)
-		for _, tExpr := range parsedExpr.Exprs {
-			r = append(r, b.tableExpr(tExpr))
-		}
-		return formatTables(r)
-	case *sqlparser.JoinTableExpr:
-		leftExpr := b.tableExpr(parsedExpr.LeftExpr)
-		rightExpr := b.tableExpr(parsedExpr.RightExpr)
-		on := b.expr(parsedExpr.Condition.On)
-		return formatJoin(parsedExpr.Join, leftExpr, rightExpr, on)
-	default:
-		unknownType(parsedExpr)
-	}
-	return ""
-}
-
-func (b *BuilderStruct) simpleTableExpr(expr sqlparser.SimpleTableExpr) string {
-	switch parsedExpr := expr.(type) {
-	case sqlparser.TableName:
-		return formatDBTable(parsedExpr.Qualifier.String(), parsedExpr.Name.String())
-	case *sqlparser.Subquery:
-		return formatSubquery(b.selectStatement(parsedExpr.Select))
-	default:
-		unknownType(expr)
-	}
-	return ""
-}
-
 func (b *BuilderStruct) selectStatement(selectStmt sqlparser.SelectStatement) string {
 	switch parsedSelectStatement := selectStmt.(type) {
 	case *sqlparser.Select:
@@ -174,31 +129,6 @@ func (b *BuilderStruct) selectStatement(selectStmt sqlparser.SelectStatement) st
 		//return fmt.Sprintf("(%s)", b.selectStatement(parsedSelectStatement.Select))
 	default:
 		unknownType(parsedSelectStatement)
-	}
-	return ""
-}
-
-func (b *BuilderStruct) selectExprs(selectExprs sqlparser.SelectExprs) []string {
-	result := make([]string, 0)
-	for _, selectExpr := range selectExprs {
-		result = append(result, b.selectExpr(selectExpr))
-	}
-	return result
-}
-
-func (b *BuilderStruct) selectExpr(selectExpr sqlparser.SelectExpr) string {
-	switch parsedSelectExpr := selectExpr.(type) {
-	case *sqlparser.StarExpr:
-		// pattern of 'COUNT(*)'
-		return b.asterOption(parsedSelectExpr.TableName.Name.String())
-	case *sqlparser.AliasedExpr:
-		// TODO aliased consideration
-		return b.expr(parsedSelectExpr.Expr)
-		//case sqlparser.Nextval:
-	case sqlparser.Expr:
-		return b.expr(parsedSelectExpr)
-	default:
-		unknownType(parsedSelectExpr)
 	}
 	return ""
 }
